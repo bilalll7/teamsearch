@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* TeamSearch v2.0 - Editorial Professional */
+  
+  /* Dark navy foundation */
+  --color-background: #0F172A;
+  --color-surface: #1E293B;
+  --color-surface-elevated: #334155;
+  
+  /* Typography colors */
+  --color-foreground: #F8FAFC;
+  --color-muted-foreground: #94A3B8;
+  
+  /* Warm accent (strategic) */
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  
+  /* Action colors */
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  
+  /* Borders */
+  --color-border: #334155;
+  --color-border-subtle: #1E293B;
+  
+  /* Status */
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  
+  /* Card */
+  --color-card: #1E293B;
+  --color-card-foreground: #F8FAFC;
+  
+  /* Muted */
+  --color-muted: #1E293B;
+  
+  /* Ring */
+  --color-ring: #3B82F6;
+  
+  /* Destructive */
+  --color-destructive: #EF4444;
+  
+  /* Typography scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  
+  /* Font family */
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
