@@ -30,6 +30,18 @@ export class ProfileService {
     return profile;
   }
 
+  async getPublicProfile(userId: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      include: {
+        portfolioLinks: true,
+        userSkills: { include: { skill: { include: { kategori: true } } } },
+      },
+    });
+    if (!profile) throw new NotFoundException('Profile not found');
+    return profile;
+  }
+
   async updateProfile(userId: string, dto: UpdateProfileDto) {
     const profile = await this.prisma.profile.findUnique({
       where: { userId },

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OpportunityService } from './opportunity.service';
 import { PrismaService } from '../prisma.service';
 
+jest.mock('../prisma.service', () => ({ PrismaService: class PrismaService {} }));
+
 describe('OpportunityService - Matching Algorithm', () => {
   let service: OpportunityService;
   let prisma: PrismaService;
@@ -113,6 +115,18 @@ describe('OpportunityService - Matching Algorithm', () => {
     expect(result.score).toBeCloseTo(71.43, 2);
     expect(result.totalWeight).toBe(7);
     expect(result.weightedScore).toBe(5);
+  });
+
+  it('does not grant credit below the minimum required level', async () => {
+    jest.spyOn(prisma.position, 'findUnique').mockResolvedValue({
+      id: 'p', skillRequirements: [{ skillId: 'react', bobot: 5, jenis: 'must_have', levelMinimum: 3, skill: { nama: 'React' } }],
+    } as any);
+    jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({
+      id: 'u', profile: { userSkills: [{ skillId: 'react', level: 1 }] },
+    } as any);
+    const result = await service.calculateMatchScore('p', 'u');
+    expect(result.score).toBe(0);
+    expect(result.missing).toHaveLength(1);
   });
 
   it('should return null score with reason when position has no requirements', async () => {

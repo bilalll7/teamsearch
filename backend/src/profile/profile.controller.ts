@@ -13,6 +13,11 @@ export class ProfileController {
     return this.profileService.getProfile(req.user.userId);
   }
 
+  @Get(':userId')
+  async getPublicProfile(@Param('userId') userId: string) {
+    return this.profileService.getPublicProfile(userId);
+  }
+
   @Patch('me')
   async updateMyProfile(@Req() req, @Body() dto: UpdateProfileDto) {
     return this.profileService.updateProfile(req.user.userId, dto);

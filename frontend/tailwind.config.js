@@ -7,37 +7,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0F172A',
+        background: 'var(--color-background)',
         surface: {
-          DEFAULT: '#1E293B',
-          elevated: '#334155',
+          DEFAULT: 'var(--color-surface)',
+          elevated: 'var(--color-surface-elevated)',
         },
-        foreground: '#F8FAFC',
+        foreground: 'var(--color-foreground)',
         primary: {
-          DEFAULT: '#3B82F6',
-          hover: '#2563EB',
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
         },
         accent: {
-          DEFAULT: '#F59E0B',
-          hover: '#D97706',
+          DEFAULT: 'var(--color-accent)',
+          hover: 'var(--color-accent-hover)',
         },
         muted: {
-          DEFAULT: '#1E293B',
-          foreground: '#94A3B8',
+          DEFAULT: 'var(--color-muted)',
+          foreground: 'var(--color-muted-foreground)',
         },
         border: {
-          DEFAULT: '#334155',
-          subtle: '#1E293B',
+          DEFAULT: 'var(--color-border)',
+          subtle: 'var(--color-border-subtle)',
         },
         card: {
-          DEFAULT: '#1E293B',
-          foreground: '#F8FAFC',
+          DEFAULT: 'var(--color-card)',
+          foreground: 'var(--color-card-foreground)',
         },
-        destructive: '#EF4444',
-        success: '#10B981',
-        warning: '#F59E0B',
-        error: '#EF4444',
-        ring: '#3B82F6',
+        destructive: 'var(--color-destructive)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error, #EF4444)',
+        ring: 'var(--color-ring)',
       },
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
@@ -57,20 +57,11 @@ export default {
       },
       spacing: {
         '18': '4.5rem',
-        '72': '18rem',
-        '80': '20rem',
-        '96': '24rem',
       },
       borderRadius: {
         'lg': '12px',
         'xl': '16px',
         '2xl': '24px',
-      },
-      boxShadow: {
-        'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
-      },
-      transitionDuration: {
-        '200': '200ms',
       },
     },
   },

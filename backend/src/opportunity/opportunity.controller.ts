@@ -19,6 +19,8 @@ import {
   UpdatePositionDto,
   CreatePositionSkillRequirementDto,
   UpdatePositionSkillRequirementDto,
+  CreateApplicationDto,
+  UpdateApplicationStatusDto,
 } from './dto/opportunity.dto';
 
 @Controller('opportunities')
@@ -75,7 +77,11 @@ export class OpportunityController {
     @Param('opportunityId') opportunityId: string,
     @Body() dto: CreatePositionDto,
   ) {
-    return this.opportunityService.createPosition(req.user.userId, opportunityId, dto);
+    return this.opportunityService.createPosition(
+      req.user.userId,
+      opportunityId,
+      dto,
+    );
   }
 
   @Patch('positions/:positionId')
@@ -85,7 +91,11 @@ export class OpportunityController {
     @Param('positionId') positionId: string,
     @Body() dto: UpdatePositionDto,
   ) {
-    return this.opportunityService.updatePosition(req.user.userId, positionId, dto);
+    return this.opportunityService.updatePosition(
+      req.user.userId,
+      positionId,
+      dto,
+    );
   }
 
   @Delete('positions/:positionId')
@@ -137,7 +147,64 @@ export class OpportunityController {
 
   // Matching endpoints
   @Get('positions/:positionId/matches')
-  async getMatches(@Param('positionId') positionId: string) {
-    return this.opportunityService.getMatchesForPosition(positionId);
+  @UseGuards(JwtAuthGuard)
+  async getMatches(@Req() req, @Param('positionId') positionId: string) {
+    return this.opportunityService.getMatchesForPosition(
+      positionId,
+      req.user.userId,
+    );
+  }
+
+  @Get('teams/me')
+  @UseGuards(JwtAuthGuard)
+  async getMyTeams(@Req() req) {
+    return this.opportunityService.getMyTeams(req.user.userId);
+  }
+
+  // Application endpoints (FR-08, FR-09)
+  @Post('positions/:positionId/applications')
+  @UseGuards(JwtAuthGuard)
+  async createApplication(
+    @Req() req,
+    @Param('positionId') positionId: string,
+    @Body() dto: CreateApplicationDto,
+  ) {
+    return this.opportunityService.createApplication(
+      req.user.userId,
+      positionId,
+      dto,
+    );
+  }
+
+  @Get('positions/:positionId/applications')
+  @UseGuards(JwtAuthGuard)
+  async getApplicationsForPosition(
+    @Req() req,
+    @Param('positionId') positionId: string,
+  ) {
+    return this.opportunityService.getApplicationsForPosition(
+      req.user.userId,
+      positionId,
+    );
+  }
+
+  @Get('applications/me')
+  @UseGuards(JwtAuthGuard)
+  async getMyApplications(@Req() req) {
+    return this.opportunityService.getMyApplications(req.user.userId);
+  }
+
+  @Patch('applications/:applicationId')
+  @UseGuards(JwtAuthGuard)
+  async updateApplicationStatus(
+    @Req() req,
+    @Param('applicationId') applicationId: string,
+    @Body() dto: UpdateApplicationStatusDto,
+  ) {
+    return this.opportunityService.updateApplicationStatus(
+      req.user.userId,
+      applicationId,
+      dto,
+    );
   }
 }

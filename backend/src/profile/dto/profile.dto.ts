@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MaxLength, IsBoolean, IsUrl, IsIn } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsBoolean, IsUrl, IsIn, IsArray, IsObject } from 'class-validator';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -20,6 +20,36 @@ export class UpdateProfileDto {
   @IsString()
   @MaxLength(20)
   angkatan?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  headline?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  lokasi?: string;
+
+  @IsOptional()
+  @IsUrl({ protocols: ['https'], require_protocol: true })
+  @MaxLength(500)
+  avatarUrl?: string;
+
+  @IsOptional()
+  @IsUrl({ protocols: ['https'], require_protocol: true })
+  @MaxLength(500)
+  resumeUrl?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  pengalaman?: Record<string, unknown>[];
+
+  @IsOptional()
+  @IsArray()
+  @IsObject({ each: true })
+  pendidikan?: Record<string, unknown>[];
 
   @IsOptional()
   @IsBoolean()

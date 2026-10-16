@@ -1,10 +1,16 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -15,184 +21,141 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    // PD-01: validate email against allowlist
-    const emailDomain = '@' + dto.email.split('@')[1];
+    const email = dto.email.trim().toLowerCase();
     const allowedDomain = await this.prisma.allowedDomain.findFirst({
-      where: {
-        domain: emailDomain,
-        aktif: true,
-      },
-      include: { campus: true },
+      where: { domain: '@' + email.split('@')[1], aktif: true },
     });
-
-    if (!allowedDomain) {
-      throw new BadRequestException('Email domain not allowed for registration');
-    }
-
-    // Check existing user
-    const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    if (!allowedDomain)
+      throw new BadRequestException(
+        'Email domain not allowed for registration',
+      );
+    const existing = await this.prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
     });
-
-    if (existing) {
-      throw new ConflictException('Email already registered');
-    }
-
-    // Hash password with bcrypt (replacing Argon2id due to Windows build constraints)
-    // ponytail: bcrypt rounds=10 default; PD-07 specified Argon2id m=19456,t=2,p=1 but unavailable on Windows without C++ build tools
+    if (existing) throw new ConflictException('Email already registered');
     const passwordHash = await bcrypt.hash(dto.password, 10);
-
-    // Create user
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        passwordHash,
-        campusId: allowedDomain.campusId,
-        statusVerifikasi: false, // ponytail: email verification pending (tokens not yet implemented per D-07 open decision)
-      },
-    });
-
-    // Create empty profile (BR-02.1: field wajib will be filled later)
-    await this.prisma.profile.create({
-      data: {
-        userId: user.id,
-        namaTampilan: dto.email.split('@')[0], // default from email
-        bio: null,
-      },
-    });
-
-    return {
-      message: 'Registration successful',
-      userId: user.id,
-    };
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email,
+          passwordHash,
+          campusId: allowedDomain.campusId,
+          statusVerifikasi: false,
+          profile: { create: { namaTampilan: email.split('@')[0] } },
+        },
+      });
+      return { message: 'Registration successful', userId: user.id };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      )
+        throw new ConflictException('Email already registered');
+      throw error;
+    }
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: dto.email.trim(), mode: 'insensitive' } },
     });
-
-    if (!user) {
+    if (!user || !(await bcrypt.compare(dto.password, user.passwordHash)))
       throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const valid = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!valid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // ponytail: email verification check skipped until token entities implemented (D-07 pending)
-    // if (!user.statusVerifikasi) {
-    //   throw new UnauthorizedException('Email not verified');
-    // }
-
-    // Generate tokens per PD-07
-    const { accessToken, refreshToken } = await this.generateTokens(user.id);
-
-    return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-      },
-    };
+    const tokens = await this.generateTokens(user.id);
+    return { ...tokens, user: { id: user.id, email: user.email } };
   }
 
-  async refresh(userId: string, oldRefreshToken: string) {
-    // PD-07: refresh token rotation with reuse detection
-    const tokenHash = await bcrypt.hash(oldRefreshToken, 10);
-    
-    const storedToken = await this.prisma.refreshToken.findUnique({
-      where: { tokenHash },
-    });
+  private digest(token: string) {
+    return createHash('sha256').update(token).digest('hex');
+  }
 
-    if (!storedToken || storedToken.revokedAt) {
-      // Reuse detected — revoke entire family per PD-07
-      if (storedToken?.familyId) {
-        await this.prisma.refreshToken.updateMany({
-          where: { familyId: storedToken.familyId },
+  async refresh(userId: string, token: string) {
+    // SHA-256 gives a stable lookup for high-entropy JWTs. Previously issued
+    // bcrypt records cannot be looked up reliably; those sessions sign in again.
+    const outcome = await this.prisma.$transaction(async (tx) => {
+      const stored = await tx.refreshToken.findUnique({
+        where: { tokenHash: this.digest(token) },
+      });
+      if (!stored || stored.userId !== userId || stored.expiresAt < new Date())
+        return null;
+      if (stored.revokedAt) {
+        await tx.refreshToken.updateMany({
+          where: { familyId: stored.familyId },
           data: { revokedAt: new Date() },
         });
+        return null;
       }
-      throw new UnauthorizedException('Token reuse detected');
-    }
-
-    if (storedToken.expiresAt < new Date()) {
-      throw new UnauthorizedException('Refresh token expired');
-    }
-
-    if (storedToken.userId !== userId) {
-      throw new UnauthorizedException('Invalid token');
-    }
-
-    // Revoke old token
-    await this.prisma.refreshToken.update({
-      where: { id: storedToken.id },
-      data: { revokedAt: new Date() },
+      const consumed = await tx.refreshToken.updateMany({
+        where: { id: stored.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      if (consumed.count !== 1) {
+        await tx.refreshToken.updateMany({
+          where: { familyId: stored.familyId },
+          data: { revokedAt: new Date() },
+        });
+        return null;
+      }
+      return this.generateTokens(userId, stored.familyId, tx);
     });
-
-    // Issue new tokens with same family
-    const { accessToken, refreshToken } = await this.generateTokens(
-      userId,
-      storedToken.familyId,
-    );
-
-    return { accessToken, refreshToken };
+    if (!outcome)
+      throw new UnauthorizedException('Session expired. Please sign in again.');
+    return outcome;
   }
 
-  async logout(userId: string, refreshToken: string) {
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
-    
-    await this.prisma.refreshToken.updateMany({
-      where: {
-        userId,
-        tokenHash,
-      },
-      data: { revokedAt: new Date() },
+  async logout(userId: string, token: string) {
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: this.digest(token) },
     });
-
+    if (stored?.userId === userId) {
+      await this.prisma.refreshToken.updateMany({
+        where: { userId, familyId: stored.familyId },
+        data: { revokedAt: new Date() },
+      });
+    } else {
+      // Retire legacy bcrypt-backed sessions for this user on explicit logout.
+      await this.prisma.refreshToken.updateMany({
+        where: { userId, tokenHash: { startsWith: '$2' } },
+        data: { revokedAt: new Date() },
+      });
+    }
     return { message: 'Logged out successfully' };
   }
 
-  private async generateTokens(userId: string, familyId?: string) {
-    const payload = { sub: userId };
-
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      expiresIn: '15m', // PD-07
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: '7d', // PD-07
-    });
-
-    // Store hashed refresh token per PD-07
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
-    const newFamilyId = familyId || randomBytes(16).toString('hex');
-
-    await this.prisma.refreshToken.create({
+  private async generateTokens(
+    userId: string,
+    familyId: string = randomUUID(),
+    client: Prisma.TransactionClient = this.prisma,
+  ) {
+    const accessToken = this.jwtService.sign(
+      { sub: userId },
+      {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '15m',
+      },
+    );
+    const refreshToken = this.jwtService.sign(
+      { sub: userId, jti: randomUUID() },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '7d',
+      },
+    );
+    await client.refreshToken.create({
       data: {
         userId,
-        tokenHash,
-        familyId: newFamilyId,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        tokenHash: this.digest(refreshToken),
+        familyId,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
-
     return { accessToken, refreshToken };
   }
 
   async validateUser(userId: string) {
     return this.prisma.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        campusId: true,
-        statusVerifikasi: true,
-      },
+      select: { id: true, email: true, campusId: true, statusVerifikasi: true },
     });
   }
 }

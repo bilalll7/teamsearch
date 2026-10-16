@@ -77,6 +77,12 @@ model Profile {
   bio             String?  @db.Text // ≤300 chars validated in app
   programStudi    String?
   angkatan        String?
+  headline        String?  @db.VarChar(160)
+  lokasi          String?  @db.VarChar(120)
+  avatarUrl       String?  @db.VarChar(500)
+  resumeUrl       String?  @db.VarChar(500)
+  pengalaman      Json?
+  pendidikan      Json?
   ketersediaan    Boolean  @default(true)
   updatedAt       DateTime @updatedAt
   

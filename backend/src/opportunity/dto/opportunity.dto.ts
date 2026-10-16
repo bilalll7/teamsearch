@@ -1,6 +1,61 @@
-import { IsString, IsOptional, MaxLength, IsDateString, IsIn, IsInt, Min, Max, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  MaxLength,
+  IsDateString,
+  IsIn,
+  IsInt,
+  Min,
+  Max,
+  IsArray,
+  ArrayMinSize,
+  ArrayMaxSize,
+  ValidateNested,
+  MinLength,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class NestedRequirementDto {
+  @IsString()
+  @MinLength(1)
+  skillId: string;
+  @IsIn(['must_have', 'nice_to_have'])
+  jenis: string;
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  levelMinimum: number;
+}
+
+export class NestedPositionDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  nama: string;
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  jumlahSlot: number;
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  deskripsi?: string;
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => NestedRequirementDto)
+  requirements: NestedRequirementDto[];
+}
 
 export class CreateOpportunityDto {
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => NestedPositionDto)
+  positions?: NestedPositionDto[];
+
   @IsString()
   @MaxLength(200)
   judul: string;
@@ -58,6 +113,13 @@ export class UpdateOpportunityDto {
 }
 
 export class CreatePositionDto {
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => NestedRequirementDto)
+  requirements?: NestedRequirementDto[];
+
   @IsString()
   @MaxLength(100)
   nama: string;
@@ -113,4 +175,16 @@ export class UpdatePositionSkillRequirementDto {
   @Min(1)
   @Max(3)
   levelMinimum?: number;
+}
+
+export class CreateApplicationDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  pesan?: string;
+}
+
+export class UpdateApplicationStatusDto {
+  @IsIn(['shortlisted', 'accepted', 'rejected', 'withdrawn'])
+  status: string;
 }

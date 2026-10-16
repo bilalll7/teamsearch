@@ -1,0 +1,175 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Title -->
+    <mxCell id="title" value="DFD Level 0 — TeamSearch MVP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="527" y="40" width="600" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ===== EXTERNAL ENTITIES ===== -->
+
+    <!-- E1: Mahasiswa (Pencari Tim) -->
+    <mxCell id="E1" value="Mahasiswa&#xa;(Pencari Tim)" style="shape=mxgraph.dfd.start2;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="80" y="480" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- E2: Mahasiswa (Pemilik Opportunity) -->
+    <mxCell id="E2" value="Mahasiswa&#xa;(Pemilik Opportunity)" style="shape=mxgraph.dfd.start2;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="80" y="280" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- E3: Admin Kampus -->
+    <mxCell id="E3" value="Admin Kampus&#xa;(Seed Data)" style="shape=mxgraph.dfd.start2;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="80" y="100" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- E4: Email Server -->
+    <mxCell id="E4" value="Email Server&#xa;(Future)" style="shape=mxgraph.dfd.start2;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="1414" y="100" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- ===== CENTRAL PROCESS ===== -->
+
+    <!-- P0: Sistem TeamSearch -->
+    <mxCell id="P0" value="0&#xa;SISTEM TEAMSEARCH" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="627" y="340" width="400" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- ===== DATA STORES ===== -->
+
+    <!-- DS1: Database PostgreSQL -->
+    <mxCell id="DS1" value="D1   Database PostgreSQL (Prisma)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="627" y="700" width="400" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- DS2: Refresh Token Store -->
+    <mxCell id="DS2" value="D2   Refresh Token Store (DB)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="627" y="800" width="400" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- DS3: Skill Catalog -->
+    <mxCell id="DS3" value="D3   Skill Catalog (Seed)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="627" y="900" width="400" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- DS4: Allowed Domains -->
+    <mxCell id="DS4" value="D4   Allowed Email Domains (Kampus)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="627" y="1000" width="400" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== DATA FLOWS: E3 Admin → System ===== -->
+
+    <mxCell id="F_E3_P0" value="Data seed: skill catalog,&#xa;campus &amp; allowed domains" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="E3" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===== DATA FLOWS: E2 Pemilik → System ===== -->
+
+    <mxCell id="F_E2_P0" value="Data registrasi, login,&#xa;buat opportunity, posisi,&#xa;skill requirement, terima/tolak aplikasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.4;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="E2" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="F_P0_E2" value="Info opportunity, daftar pelamar,&#xa;status aplikasi, notifikasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=0.4;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="P0" target="E2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="580" y="412" />
+          <mxPoint x="580" y="320" />
+          <mxPoint x="240" y="320" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ===== DATA FLOWS: E1 Pencari → System ===== -->
+
+    <mxCell id="F_E1_P0" value="Data registrasi, login, profil,&#xa;skill, portfolio, lamar posisi,&#xa;request kontak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="E1" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="F_P0_E1" value="Hasil pencarian &amp; skor kecocokan,&#xa;status aplikasi, notifikasi,&#xa;data kontak (jika disetujui)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0;exitY=0.6;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="P0" target="E1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="580" y="528" />
+          <mxPoint x="580" y="520" />
+          <mxPoint x="240" y="520" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ===== DATA FLOWS: System → Email Server ===== -->
+
+    <mxCell id="F_P0_E4" value="Email verifikasi akun,&#xa;password reset&#xa;(belum diimplementasi)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="P0" target="E4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ===== DATA FLOWS: System ↔ Data Stores ===== -->
+
+    <mxCell id="F_P0_DS1_w" value="Simpan: user, profil, skill, opportunity,&#xa;posisi, aplikasi, tim, notifikasi, kontak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.35;entryY=0;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="P0" target="DS1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="F_DS1_P0_r" value="Baca: data profil, opportunity,&#xa;aplikasi, tim, notifikasi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.65;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="DS1" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="F_P0_DS2" value="Simpan/verifikasi/revoke refresh token" style="edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="P0" target="DS2" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="827" y="760" />
+          <mxPoint x="827" y="800" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="F_DS3_P0" value="Baca: daftar skill &amp; kategori&#xa;(untuk matching &amp; UI)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.65;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="DS3" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="827" y="900" />
+          <mxPoint x="887" y="900" />
+          <mxPoint x="887" y="840" />
+          <mxPoint x="960" y="840" />
+          <mxPoint x="960" y="540" />
+          <mxPoint x="887" y="540" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="F_DS4_P0" value="Baca: allowed domain&#xa;(validasi email registrasi)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.8;entryY=1;entryDx=0;entryDy=0;strokeColor=#000000;fontColor=#000000;" edge="1" source="DS4" target="P0" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="827" y="1000" />
+          <mxPoint x="1000" y="1000" />
+          <mxPoint x="1000" y="840" />
+          <mxPoint x="1050" y="840" />
+          <mxPoint x="1050" y="540" />
+          <mxPoint x="947" y="540" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ===== LEGEND ===== -->
+    <mxCell id="leg_title" value="Keterangan" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="80" y="740" width="120" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_ext" value="" style="shape=mxgraph.dfd.start2;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="80" y="780" width="50" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_ext_lbl" value="Entitas Eksternal" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="140" y="780" width="160" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_proc" value="" style="ellipse;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="80" y="815" width="50" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_proc_lbl" value="Proses Utama" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="140" y="815" width="160" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_ds" value="" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="80" y="850" width="50" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_ds_lbl" value="Data Store" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="140" y="850" width="160" height="25" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

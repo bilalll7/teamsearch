@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import {
   CreateOpportunityDto,
@@ -7,6 +13,8 @@ import {
   UpdatePositionDto,
   CreatePositionSkillRequirementDto,
   UpdatePositionSkillRequirementDto,
+  CreateApplicationDto,
+  UpdateApplicationStatusDto,
 } from './dto/opportunity.dto';
 
 @Injectable()
@@ -29,6 +37,38 @@ export class OpportunityService {
       throw new NotFoundException('User not found');
     }
 
+    if (!dto.judul.trim() || !dto.deskripsi.trim() || !dto.kategori.trim()) {
+      throw new BadRequestException(
+        'Judul, deskripsi, dan kategori wajib diisi',
+      );
+    }
+    const skillIds = [
+      ...new Set(
+        (dto.positions || []).flatMap((p) =>
+          p.requirements.map((r) => r.skillId),
+        ),
+      ),
+    ];
+    if (skillIds.length) {
+      const active = await this.prisma.skill.count({
+        where: { id: { in: skillIds }, status: 'aktif' },
+      });
+      if (active !== skillIds.length)
+        throw new BadRequestException('Ada keahlian yang tidak tersedia');
+    }
+    for (const position of dto.positions || []) {
+      if (!position.nama.trim())
+        throw new BadRequestException('Nama posisi wajib diisi');
+      if (
+        new Set(position.requirements.map((r) => r.skillId)).size !==
+        position.requirements.length
+      ) {
+        throw new BadRequestException(
+          'Keahlian dalam satu posisi tidak boleh duplikat',
+        );
+      }
+    }
+
     return this.prisma.opportunity.create({
       data: {
         ownerId: userId,
@@ -38,7 +78,24 @@ export class OpportunityService {
         kategori: dto.kategori,
         mode: dto.mode,
         tenggat: dto.tenggat ? new Date(dto.tenggat) : null,
-        status: 'draft', // BR-04.5: can save as draft
+        status: 'open', // langsung tampil di papan
+        positions: dto.positions
+          ? {
+              create: dto.positions.map((p) => ({
+                nama: p.nama.trim(),
+                jumlahSlot: p.jumlahSlot,
+                deskripsi: p.deskripsi,
+                skillRequirements: {
+                  create: p.requirements.map((r) => ({
+                    skillId: r.skillId,
+                    jenis: r.jenis,
+                    levelMinimum: r.levelMinimum,
+                    bobot: r.jenis === 'must_have' ? 5 : 2,
+                  })),
+                },
+              })),
+            }
+          : undefined,
       },
       include: {
         owner: {
@@ -64,7 +121,13 @@ export class OpportunityService {
   }) {
     return this.prisma.opportunity.findMany({
       where: {
-        status: filters?.status || { in: ['open', 'draft'] }, // BR-04.3: expired not in active list
+        status:
+          filters?.status === 'draft' ? 'open' : filters?.status || 'open',
+        ...(!filters?.status || ['open', 'draft'].includes(filters.status)
+          ? {
+              OR: [{ tenggat: null }, { tenggat: { gt: new Date() } }],
+            }
+          : {}),
         ...(filters?.jenis && { jenis: filters.jenis }),
         ...(filters?.kategori && { kategori: filters.kategori }),
         ...(filters?.kampus && {
@@ -142,7 +205,11 @@ export class OpportunityService {
     return opportunity;
   }
 
-  async updateOpportunity(userId: string, id: string, dto: UpdateOpportunityDto) {
+  async updateOpportunity(
+    userId: string,
+    id: string,
+    dto: UpdateOpportunityDto,
+  ) {
     const opportunity = await this.prisma.opportunity.findUnique({
       where: { id },
     });
@@ -152,7 +219,9 @@ export class OpportunityService {
     }
 
     if (opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only update your own opportunities');
+      throw new ForbiddenException(
+        'You can only update your own opportunities',
+      );
     }
 
     // Validate tenggat if provided
@@ -184,7 +253,9 @@ export class OpportunityService {
     }
 
     if (opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only delete your own opportunities');
+      throw new ForbiddenException(
+        'You can only delete your own opportunities',
+      );
     }
 
     await this.prisma.opportunity.delete({
@@ -195,7 +266,11 @@ export class OpportunityService {
   }
 
   // Position Management
-  async createPosition(userId: string, opportunityId: string, dto: CreatePositionDto) {
+  async createPosition(
+    userId: string,
+    opportunityId: string,
+    dto: CreatePositionDto,
+  ) {
     const opportunity = await this.prisma.opportunity.findUnique({
       where: { id: opportunityId },
     });
@@ -205,20 +280,48 @@ export class OpportunityService {
     }
 
     if (opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only add positions to your own opportunities');
+      throw new ForbiddenException(
+        'You can only add positions to your own opportunities',
+      );
     }
 
+    if (!dto.nama.trim())
+      throw new BadRequestException('Nama posisi wajib diisi');
+    const requirements = dto.requirements || [];
+    const skillIds = [...new Set(requirements.map((r) => r.skillId))];
+    if (skillIds.length !== requirements.length)
+      throw new BadRequestException('Keahlian tidak boleh duplikat');
+    if (
+      skillIds.length &&
+      (await this.prisma.skill.count({
+        where: { id: { in: skillIds }, status: 'aktif' },
+      })) !== skillIds.length
+    ) {
+      throw new BadRequestException('Ada keahlian yang tidak tersedia');
+    }
     return this.prisma.position.create({
       data: {
         opportunityId,
         nama: dto.nama,
         jumlahSlot: dto.jumlahSlot,
         deskripsi: dto.deskripsi,
+        skillRequirements: {
+          create: requirements.map((r) => ({
+            skillId: r.skillId,
+            jenis: r.jenis,
+            levelMinimum: r.levelMinimum,
+            bobot: r.jenis === 'must_have' ? 5 : 2,
+          })),
+        },
       },
     });
   }
 
-  async updatePosition(userId: string, positionId: string, dto: UpdatePositionDto) {
+  async updatePosition(
+    userId: string,
+    positionId: string,
+    dto: UpdatePositionDto,
+  ) {
     const position = await this.prisma.position.findUnique({
       where: { id: positionId },
       include: { opportunity: true },
@@ -229,7 +332,9 @@ export class OpportunityService {
     }
 
     if (position.opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only update positions in your own opportunities');
+      throw new ForbiddenException(
+        'You can only update positions in your own opportunities',
+      );
     }
 
     return this.prisma.position.update({
@@ -249,7 +354,9 @@ export class OpportunityService {
     }
 
     if (position.opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only delete positions in your own opportunities');
+      throw new ForbiddenException(
+        'You can only delete positions in your own opportunities',
+      );
     }
 
     await this.prisma.position.delete({
@@ -275,7 +382,9 @@ export class OpportunityService {
     }
 
     if (position.opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only add requirements to your own positions');
+      throw new ForbiddenException(
+        'You can only add requirements to your own positions',
+      );
     }
 
     // Verify skill exists and is active
@@ -302,7 +411,9 @@ export class OpportunityService {
     });
 
     if (existing) {
-      throw new ConflictException('Skill requirement already exists for this position');
+      throw new ConflictException(
+        'Skill requirement already exists for this position',
+      );
     }
 
     // PD-05: Fixed weights must_have=5, nice_to_have=2
@@ -345,11 +456,17 @@ export class OpportunityService {
     }
 
     if (requirement.position.opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only update requirements in your own positions');
+      throw new ForbiddenException(
+        'You can only update requirements in your own positions',
+      );
     }
 
     // PD-05: Recalculate bobot if jenis changes
-    const bobot = dto.jenis ? (dto.jenis === 'must_have' ? 5 : 2) : requirement.bobot;
+    const bobot = dto.jenis
+      ? dto.jenis === 'must_have'
+        ? 5
+        : 2
+      : requirement.bobot;
 
     return this.prisma.positionSkillRequirement.update({
       where: { id: requirementId },
@@ -382,7 +499,9 @@ export class OpportunityService {
     }
 
     if (requirement.position.opportunity.ownerId !== userId) {
-      throw new ForbiddenException('You can only delete requirements in your own positions');
+      throw new ForbiddenException(
+        'You can only delete requirements in your own positions',
+      );
     }
 
     await this.prisma.positionSkillRequirement.delete({
@@ -471,7 +590,9 @@ export class OpportunityService {
       totalWeight += weight;
 
       const candidateHasSkill = candidateSkills.some(
-        (cs) => cs.skillId === req.skillId,
+        (cs) =>
+          cs.skillId === req.skillId &&
+          (cs.level ?? 1) >= (req.levelMinimum ?? 1),
       );
 
       if (candidateHasSkill) {
@@ -506,7 +627,7 @@ export class OpportunityService {
     };
   }
 
-  async getMatchesForPosition(positionId: string) {
+  async getMatchesForPosition(positionId: string, userId: string) {
     const position = await this.prisma.position.findUnique({
       where: { id: positionId },
       include: {
@@ -519,10 +640,13 @@ export class OpportunityService {
       throw new NotFoundException('Position not found');
     }
 
-    // Get all users with profiles (BR-06.1: minimal 1 skill)
+    if (position.opportunity.ownerId !== userId)
+      throw new ForbiddenException('Only the owner can view matches');
+    // Get available users with profiles (BR-06.1: minimal 1 skill)
     const candidates = await this.prisma.user.findMany({
       where: {
         profile: {
+          ketersediaan: true,
           userSkills: {
             some: {},
           },
@@ -561,7 +685,10 @@ export class OpportunityService {
         continue;
       }
 
-      const matchResult = await this.calculateMatchScore(positionId, candidate.id);
+      const matchResult = await this.calculateMatchScore(
+        positionId,
+        candidate.id,
+      );
 
       matches.push({
         candidateId: candidate.id,
@@ -582,5 +709,237 @@ export class OpportunityService {
     });
 
     return matches;
+  }
+
+  // Applications (FR-08 candidate applies, FR-09 owner manages)
+  async createApplication(
+    userId: string,
+    positionId: string,
+    dto: CreateApplicationDto,
+  ) {
+    const position = await this.prisma.position.findUnique({
+      where: { id: positionId },
+      include: { opportunity: true },
+    });
+
+    if (!position) {
+      throw new NotFoundException('Position not found');
+    }
+
+    // BR-08.3: only open + before deadline
+    if (position.opportunity.status !== 'open') {
+      throw new BadRequestException('Opportunity is not open');
+    }
+    if (
+      position.opportunity.tenggat &&
+      new Date(position.opportunity.tenggat) < new Date()
+    ) {
+      throw new BadRequestException('Opportunity deadline has passed');
+    }
+
+    // BR-08.4: owner cannot apply to own position
+    if (position.opportunity.ownerId === userId) {
+      throw new ForbiddenException('You cannot apply to your own opportunity');
+    }
+
+    // one active application per position (unique handles it, map to 409)
+    const existing = await this.prisma.application.findUnique({
+      where: { positionId_applicantId: { positionId, applicantId: userId } },
+    });
+    if (existing) {
+      throw new ConflictException('You already applied to this position');
+    }
+
+    // snapshot match score for decision trail (null when no requirements)
+    let score: number | null = null;
+    try {
+      const match = await this.calculateMatchScore(positionId, userId);
+      score = match.score;
+    } catch {
+      score = null;
+    }
+
+    return this.prisma.application.create({
+      data: {
+        positionId,
+        applicantId: userId,
+        pesan: dto.pesan?.trim() ? dto.pesan.trim().slice(0, 500) : null,
+        status: 'pending',
+        skorKecocokkanSaatLamar: score,
+      },
+    });
+  }
+
+  async getApplicationsForPosition(userId: string, positionId: string) {
+    const position = await this.prisma.position.findUnique({
+      where: { id: positionId },
+      include: { opportunity: true },
+    });
+    if (!position) throw new NotFoundException('Position not found');
+    if (position.opportunity.ownerId !== userId) {
+      throw new ForbiddenException('Only the owner can view applicants');
+    }
+    return this.prisma.application.findMany({
+      where: { positionId },
+      include: {
+        applicant: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                namaTampilan: true,
+                bio: true,
+                programStudi: true,
+                angkatan: true,
+                headline: true,
+                lokasi: true,
+                avatarUrl: true,
+                resumeUrl: true,
+                pengalaman: true,
+                pendidikan: true,
+                userSkills: { include: { skill: { include: { kategori: true } } } },
+                portfolioLinks: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getMyApplications(userId: string) {
+    return this.prisma.application.findMany({
+      where: { applicantId: userId },
+      include: {
+        position: {
+          select: {
+            id: true,
+            nama: true,
+            opportunity: { select: { id: true, judul: true, status: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getMyTeams(userId: string) {
+    const teams = await this.prisma.opportunity.findMany({
+      where: {
+        OR: [
+          { ownerId: userId },
+          { teamMembers: { some: { userId, status: 'aktif' } } },
+        ],
+      },
+      include: {
+        owner: { select: { profile: { select: { namaTampilan: true } } } },
+        positions: true,
+        teamMembers: { where: { status: 'aktif' } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    const ids = [
+      ...new Set(teams.flatMap((t) => t.teamMembers.map((m) => m.userId))),
+    ];
+    const profiles = await this.prisma.profile.findMany({
+      where: { userId: { in: ids } },
+      select: { userId: true, namaTampilan: true },
+    });
+    const names = new Map(profiles.map((p) => [p.userId, p.namaTampilan]));
+    return teams.map((t) => ({
+      ...t,
+      teamMembers: t.teamMembers.map((m) => ({
+        ...m,
+        namaTampilan: names.get(m.userId) || 'Anggota',
+      })),
+    }));
+  }
+
+  async updateApplicationStatus(
+    userId: string,
+    applicationId: string,
+    dto: UpdateApplicationStatusDto,
+  ) {
+    // Serialize decisions for an opportunity: capacity and one membership per person
+    // must be checked against the same committed state.
+    return this.prisma.$transaction(async (tx) => {
+      const initial = await tx.application.findUnique({
+        where: { id: applicationId },
+        include: { position: true },
+      });
+      if (!initial) throw new NotFoundException('Application not found');
+      await tx.$queryRaw`SELECT id FROM "Opportunity" WHERE id = ${initial.position.opportunityId} FOR UPDATE`;
+      const app = await tx.application.findUnique({
+        where: { id: applicationId },
+        include: { position: { include: { opportunity: true } } },
+      });
+      if (!app) throw new NotFoundException('Application not found');
+      if (dto.status === 'withdrawn') {
+        if (app.applicantId !== userId)
+          throw new ForbiddenException('Only the applicant can withdraw');
+      } else if (app.position.opportunity.ownerId !== userId) {
+        throw new ForbiddenException('Only the owner can decide');
+      }
+      if (app.status === dto.status) return app;
+      if (!['pending', 'shortlisted'].includes(app.status)) {
+        throw new BadRequestException(
+          'Lamaran ini sudah diputuskan dan tidak dapat diubah',
+        );
+      }
+      if (dto.status === 'accepted') {
+        const count = await tx.application.count({
+          where: { positionId: app.positionId, status: 'accepted' },
+        });
+        if (count >= app.position.jumlahSlot)
+          throw new BadRequestException('Slot posisi penuh');
+        const membership = await tx.teamMembership.findUnique({
+          where: {
+            opportunityId_userId: {
+              opportunityId: app.position.opportunityId,
+              userId: app.applicantId,
+            },
+          },
+        });
+        if (
+          membership?.status === 'aktif' &&
+          membership.positionId !== app.positionId
+        ) {
+          throw new BadRequestException(
+            'Kandidat sudah menjadi anggota pada posisi lain di tim ini',
+          );
+        }
+        await tx.teamMembership.upsert({
+          where: {
+            opportunityId_userId: {
+              opportunityId: app.position.opportunityId,
+              userId: app.applicantId,
+            },
+          },
+          update: {
+            positionId: app.positionId,
+            peran: app.position.nama,
+            status: 'aktif',
+            leftAt: null,
+          },
+          create: {
+            opportunityId: app.position.opportunityId,
+            positionId: app.positionId,
+            userId: app.applicantId,
+            peran: app.position.nama,
+            status: 'aktif',
+          },
+        });
+      }
+      return tx.application.update({
+        where: { id: applicationId },
+        data: {
+          status: dto.status,
+          decidedAt: ['accepted', 'rejected'].includes(dto.status)
+            ? new Date()
+            : null,
+        },
+      });
+    });
   }
 }

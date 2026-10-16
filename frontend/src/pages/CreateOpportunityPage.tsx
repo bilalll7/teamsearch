@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Button } from '../components/ui/button';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { Dropdown } from '../components/Dropdown';
 import api from '../lib/api';
+
+const inputCls =
+  'h-12 w-full rounded-lg border border-border bg-surface px-3.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+
+const labelCls = 'mb-1.5 flex items-center gap-1.5 text-sm font-medium text-foreground';
+const hintCls = 'mt-1.5 text-[13px] text-muted-foreground';
 
 export default function CreateOpportunityPage() {
   const [formData, setFormData] = useState({
@@ -12,153 +22,176 @@ export default function CreateOpportunityPage() {
     tenggat: '',
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const set = (key: keyof typeof formData) => (value: string) =>
+    setFormData((prev) => ({ ...prev, [key]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
-      const { data } = await api.post('/opportunities', formData);
-      navigate(`/opportunities/${data.id}`);
+      const payload = {
+        judul: formData.judul.trim(),
+        deskripsi: formData.deskripsi.trim(),
+        jenis: formData.jenis,
+        kategori: formData.kategori.trim(),
+        mode: formData.mode,
+        ...(formData.tenggat ? { tenggat: new Date(formData.tenggat).toISOString() } : {}),
+      };
+      const { data } = await api.post('/opportunities', payload);
+      navigate(data?.id ? `/opportunities/${data.id}` : '/opportunities');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to create opportunity');
+      const message = err.response?.data?.message;
+      setError(Array.isArray(message) ? message.join(', ') : message || t('create.failed'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <button
-            onClick={() => navigate('/opportunities')}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            ← Kembali
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen w-full overflow-x-clip bg-background text-foreground">
+      <main className="w-full pt-16">
+        <section className="w-full border-b border-border-subtle">
+          <div className="mx-auto w-full max-w-4xl px-6 py-12 md:py-16">
+            <button
+              onClick={() => navigate('/opportunities')}
+              className="text-[15px] font-medium text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              ← {t('create.back')}
+            </button>
+            <p className="mt-6 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              {t('create.eyebrow')}
+            </p>
+            <h1 className="mt-2 text-4xl font-bold tracking-tight md:text-[2.75rem] md:leading-[1.1]">
+              {t('create.title')}
+            </h1>
+            <p className="mt-3 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+              {t('create.lead')}
+            </p>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Buat Peluang Baru</h1>
+            <form onSubmit={handleSubmit} className="mt-10 rounded-xl border border-border bg-surface p-6 md:p-8">
+              {error && (
+                <p role="alert" className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-[15px] text-destructive">
+                  {error}
+                </p>
+              )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Judul <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.judul}
-                onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                maxLength={200}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Deskripsi <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={formData.deskripsi}
-                onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                rows={5}
-                maxLength={2000}
-                required
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                {formData.deskripsi.length}/2000 karakter
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Jenis <span className="text-red-500">*</span>
+              <div className="space-y-6">
+                <label className="block">
+                  <span className={labelCls}>
+                    {t('create.titleLabel')} <span className="text-destructive">*</span>
+                  </span>
+                  <input
+                    type="text"
+                    value={formData.judul}
+                    onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
+                    placeholder={t('create.titlePlaceholder')}
+                    maxLength={200}
+                    required
+                    className={inputCls}
+                  />
                 </label>
-                <select
-                  value={formData.jenis}
-                  onChange={(e) => setFormData({ ...formData, jenis: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="lomba">Lomba</option>
-                  <option value="proyek">Proyek</option>
-                </select>
+
+                <label className="block">
+                  <span className={labelCls}>
+                    {t('create.descLabel')} <span className="text-destructive">*</span>
+                  </span>
+                  <textarea
+                    value={formData.deskripsi}
+                    onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                    placeholder={t('create.descPlaceholder')}
+                    rows={6}
+                    maxLength={2000}
+                    required
+                    className="w-full rounded-lg border border-border bg-background px-3.5 py-3 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <span className={hintCls}>{formData.deskripsi.length}/2000</span>
+                </label>
+
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <label className="block">
+                    <span className={labelCls}>
+                      {t('create.jenisLabel')} <span className="text-destructive">*</span>
+                    </span>
+                    <Dropdown
+                      value={formData.jenis}
+                      onChange={set('jenis')}
+                      ariaLabel={t('create.jenisLabel')}
+                      options={[
+                        { value: 'lomba', label: 'Lomba' },
+                        { value: 'proyek', label: 'Proyek' },
+                      ]}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className={labelCls}>
+                      {t('create.modeLabel')} <span className="text-destructive">*</span>
+                    </span>
+                    <Dropdown
+                      value={formData.mode}
+                      onChange={set('mode')}
+                      ariaLabel={t('create.modeLabel')}
+                      options={[
+                        { value: 'online', label: 'Online' },
+                        { value: 'offline', label: 'Offline' },
+                        { value: 'hybrid', label: 'Hybrid' },
+                      ]}
+                    />
+                  </label>
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <label className="block">
+                    <span className={labelCls}>
+                      {t('create.kategoriLabel')} <span className="text-destructive">*</span>
+                    </span>
+                    <input
+                      type="text"
+                      value={formData.kategori}
+                      onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
+                      placeholder={t('create.kategoriPlaceholder')}
+                      maxLength={100}
+                      required
+                      className={inputCls}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className={labelCls}>{t('create.tenggatLabel')}</span>
+                    <input
+                      type="date"
+                      value={formData.tenggat}
+                      onChange={(e) => setFormData({ ...formData, tenggat: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      className={inputCls}
+                    />
+                  </label>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mode <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.mode}
-                  onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="online">Online</option>
-                  <option value="offline">Offline</option>
-                  <option value="hybrid">Hybrid</option>
-                </select>
+              <div className="mt-8 flex flex-col-reverse gap-3 border-t border-border-subtle pt-6 sm:flex-row sm:justify-end">
+                <Button size="lg" variant="secondary" type="button" onClick={() => navigate('/opportunities')}>
+                  {t('create.cancel')}
+                </Button>
+                <Button size="lg" type="submit" disabled={loading}>
+                  {loading ? (
+                    <span className="flex items-center gap-2.5">
+                      <LoadingSpinner size="sm" />
+                      {t('create.submitting')}
+                    </span>
+                  ) : (
+                    t('create.submit')
+                  )}
+                </Button>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kategori <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.kategori}
-                  onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  placeholder="Technology, Design, etc."
-                  maxLength={100}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tenggat
-                </label>
-                <input
-                  type="date"
-                  value={formData.tenggat}
-                  onChange={(e) => setFormData({ ...formData, tenggat: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading ? 'Membuat...' : 'Buat Peluang'}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/opportunities')}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-              >
-                Batal
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+            </form>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

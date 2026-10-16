@@ -1,0 +1,281 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2339" pageHeight="1654" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ============================================================ -->
+    <!--  TITLE                                                        -->
+    <!-- ============================================================ -->
+    <mxCell id="main_title" value="Flowmap — TeamSearch MVP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="700" y="30" width="800" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ============================================================ -->
+    <!--  SWIMLANE HEADERS                                             -->
+    <!-- ============================================================ -->
+    <!-- Lane: Mahasiswa -->
+    <mxCell id="hdr_user" value="Mahasiswa (Pencari / Pemilik)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="20" y="90" width="40" height="1510" as="geometry" />
+    </mxCell>
+    <!-- Lane: Frontend -->
+    <mxCell id="hdr_fe" value="Frontend (React)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="60" y="90" width="40" height="1510" as="geometry" />
+    </mxCell>
+    <!-- Lane: Backend -->
+    <mxCell id="hdr_be" value="Backend (NestJS)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="100" y="90" width="40" height="1510" as="geometry" />
+    </mxCell>
+    <!-- Lane: Database -->
+    <mxCell id="hdr_db" value="Database (PostgreSQL)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;rotation=-90;" vertex="1" parent="1">
+      <mxGeometry x="140" y="90" width="40" height="1510" as="geometry" />
+    </mxCell>
+
+    <!-- Lane dividers (vertical lines) -->
+    <mxCell id="div1" value="" style="line;strokeColor=#000000;fillColor=none;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="60" y="90" width="10" height="1510" as="geometry" />
+    </mxCell>
+    <mxCell id="div2" value="" style="line;strokeColor=#000000;fillColor=none;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="440" y="90" width="10" height="1510" as="geometry" />
+    </mxCell>
+    <mxCell id="div3" value="" style="line;strokeColor=#000000;fillColor=none;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="890" y="90" width="10" height="1510" as="geometry" />
+    </mxCell>
+    <mxCell id="div4" value="" style="line;strokeColor=#000000;fillColor=none;strokeWidth=1;" vertex="1" parent="1">
+      <mxGeometry x="1340" y="90" width="10" height="1510" as="geometry" />
+    </mxCell>
+
+    <!-- Lane background labels (column headers) -->
+    <mxCell id="col_user_hdr" value="MAHASISWA" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="60" y="90" width="380" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="col_fe_hdr" value="FRONTEND (React + Vite)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="440" y="90" width="450" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="col_be_hdr" value="BACKEND (NestJS)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="890" y="90" width="450" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="col_db_hdr" value="DATABASE (PostgreSQL)" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;align=center;fontStyle=1;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="1340" y="90" width="380" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ============================================================ -->
+    <!--  FLOW 1: REGISTRASI & LOGIN                                   -->
+    <!-- ============================================================ -->
+    <mxCell id="sec1" value="1. REGISTRASI &amp; LOGIN" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="60" y="145" width="300" height="25" as="geometry" />
+    </mxCell>
+
+    <!-- Start -->
+    <mxCell id="s1_start" value="Mulai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="180" y="185" width="100" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- Input form -->
+    <mxCell id="s1_form" value="Isi form&#xa;Registrasi / Login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="255" width="150" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- Submit → FE -->
+    <mxCell id="s1_fe_validate" value="Validasi field&#xa;(format email, password)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="565" y="255" width="170" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- FE → BE: POST /auth/register atau /auth/login -->
+    <mxCell id="s1_be_auth" value="POST /auth/register&#xa;atau /auth/login" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="960" y="255" width="180" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- BE: cek domain -->
+    <mxCell id="s1_be_domain" value="Validasi domain email&#xa;vs AllowedDomain" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="940" y="330" width="220" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- DB: baca allowed domain -->
+    <mxCell id="s1_db_domain" value="SELECT AllowedDomain&#xa;WHERE domain = @domain" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="340" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- BE: hash password & simpan user -->
+    <mxCell id="s1_be_save" value="bcrypt hash password&#xa;INSERT User + Profile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="955" y="430" width="190" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- DB: simpan user -->
+    <mxCell id="s1_db_user" value="INSERT User, Profile&#xa;(statusVerifikasi=false)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="435" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- BE: issue JWT -->
+    <mxCell id="s1_be_jwt" value="Generate access token (15m)&#xa;+ refresh token (7d)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="955" y="510" width="190" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- DB: simpan refresh token -->
+    <mxCell id="s1_db_rt" value="INSERT RefreshToken&#xa;(hash, familyId, expiresAt)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="515" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- FE: simpan token -->
+    <mxCell id="s1_fe_store" value="Simpan token di localStorage&#xa;→ redirect ke /opportunities" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="510" width="180" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- Error: domain tidak valid -->
+    <mxCell id="s1_err_domain" value="Tampil error:&#xa;'Domain email tidak terdaftar'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="340" width="180" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- Edges section 1 -->
+    <mxCell id="e_s1_start_form" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_start" target="s1_form" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_form_feval" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_form" target="s1_fe_validate" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_feval_be" value="HTTP POST" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_fe_validate" target="s1_be_auth" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_be_domain" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_auth" target="s1_be_domain" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_domain_db" value="query" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_domain" target="s1_db_domain" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_domain_ok" value="valid" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_domain" target="s1_be_save" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_domain_err" value="tidak valid" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_domain" target="s1_err_domain" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_save_db" value="insert" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_save" target="s1_db_user" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_save_jwt" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_save" target="s1_be_jwt" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_jwt_db" value="insert" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_jwt" target="s1_db_rt" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s1_jwt_fe" value="return tokens" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s1_be_jwt" target="s1_fe_store" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ============================================================ -->
+    <!--  FLOW 2: KELOLA PROFIL & SKILL                                -->
+    <!-- ============================================================ -->
+    <mxCell id="sec2" value="2. KELOLA PROFIL &amp; SKILL" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="60" y="590" width="300" height="25" as="geometry" />
+    </mxCell>
+
+    <mxCell id="s2_open" value="Buka halaman&#xa;/profile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="630" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_fe_fetch" value="GET /profile/me&#xa;GET /skills/me" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="630" width="180" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_be_get" value="ProfileController.getMyProfile()&#xa;SkillsController.getMySkills()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="940" y="630" width="230" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_db_read" value="SELECT Profile, UserSkill,&#xa;PortfolioLink WHERE userId" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="635" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_fe_render" value="Render data profil,&#xa;form edit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="710" width="180" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_edit" value="Edit nama, bio,&#xa;tambah/hapus skill" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="710" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_be_patch" value="PATCH /profile/me&#xa;POST/DELETE /skills/me" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="940" y="710" width="230" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s2_db_write" value="UPDATE Profile&#xa;INSERT/DELETE UserSkill" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="715" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_s2_open_fe" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_open" target="s2_fe_fetch" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_fe_be" value="HTTP GET + JWT" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_fe_fetch" target="s2_be_get" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_be_db" value="query" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_be_get" target="s2_db_read" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_be_fe" value="return data" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_be_get" target="s2_fe_render" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_render_edit" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_fe_render" target="s2_edit" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_edit_bepatch" value="PATCH/POST/DELETE" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_edit" target="s2_be_patch" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s2_bepatch_db" value="update/insert/delete" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s2_be_patch" target="s2_db_write" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ============================================================ -->
+    <!--  FLOW 3: BUAT & KELOLA OPPORTUNITY                            -->
+    <!-- ============================================================ -->
+    <mxCell id="sec3" value="3. BUAT &amp; KELOLA OPPORTUNITY" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="60" y="790" width="350" height="25" as="geometry" />
+    </mxCell>
+
+    <mxCell id="s3_create" value="Isi form buat&#xa;opportunity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="830" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_fe_post" value="POST /opportunities&#xa;+ posisi + skill requirement" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="830" width="190" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_be_create" value="OpportunityService.createOpportunity()&#xa;createPosition() / createSkillRequirement()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="920" y="830" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_db_opp" value="INSERT Opportunity, Position,&#xa;PositionSkillRequirement" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="835" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_fe_list" value="GET /opportunities&#xa;(filter: jenis, kampus, status)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="910" width="190" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_be_list" value="OpportunityService.getOpportunities()&#xa;+ getOpportunityById()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="920" y="910" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_db_sel" value="SELECT Opportunity JOIN&#xa;Position, Owner.Profile" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="915" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s3_fe_render" value="Tampil daftar &amp;&#xa;detail opportunity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="560" y="990" width="190" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_s3_user_fe" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_create" target="s3_fe_post" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s3_fe_be" value="HTTP POST + JWT" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_fe_post" target="s3_be_create" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s3_be_db" value="insert" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_be_create" target="s3_db_opp" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s3_fe_list_be" value="HTTP GET" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_fe_list" target="s3_be_list" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s3_be_list_db" value="query" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_be_list" target="s3_db_sel" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s3_be_list_fe" value="return list" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s3_be_list" target="s3_fe_render" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ============================================================ -->
+    <!--  FLOW 4: MATCHING & LAMARAN                                   -->
+    <!-- ============================================================ -->
+    <mxCell id="sec4" value="4. SKILL MATCHING &amp; LAMARAN" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+      <mxGeometry x="60" y="1065" width="350" height="25" as="geometry" />
+    </mxCell>
+
+    <mxCell id="s4_match_req" value="Lihat posisi &amp;&#xa;skor kecocokan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="1105" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_fe_match" value="GET /opportunities/positions/&#xa;:id/matches" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="555" y="1105" width="200" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_be_match" value="getMatchesForPosition()&#xa;Hitung S=100×Σ(wᵢ×mᵢ)/Σ(wᵢ)&#xa;(PD-05: must=5, nice=2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="915" y="1095" width="295" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_db_match" value="SELECT UserSkill, PositionSkillReq&#xa;untuk kalkulasi skor" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="1110" width="280" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_fe_score" value="Tampil skor &amp;&#xa;penjelasan kecocokan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="555" y="1190" width="200" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_apply" value="Lamar posisi&#xa;(kirim pesan)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="1270" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_fe_apply" value="POST /opportunities/positions/&#xa;:id/applications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="555" y="1270" width="200" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_be_apply" value="createApplication()&#xa;Cek slot, simpan skor saat lamar" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="920" y="1270" width="270" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_db_app" value="INSERT Application&#xa;(status=pending, skorSaatLamar)" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="1275" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- Owner review -->
+    <mxCell id="s4_owner_review" value="Pemilik review&#xa;&amp; ubah status aplikasi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="155" y="1350" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_fe_status" value="PATCH /opportunities/&#xa;applications/:id" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="555" y="1350" width="200" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_be_status" value="updateApplicationStatus()&#xa;pending→shortlisted→accepted/rejected&#xa;Auto-create TeamMembership jika accepted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="905" y="1340" width="305" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="s4_db_status" value="UPDATE Application.status&#xa;INSERT TeamMembership (jika accepted)&#xa;INSERT Notification" style="shape=mxgraph.dfd.dataStore;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+      <mxGeometry x="1400" y="1350" width="280" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_s4_user_fe" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_match_req" target="s4_fe_match" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_fe_be" value="HTTP GET" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_fe_match" target="s4_be_match" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_be_db" value="query" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_be_match" target="s4_db_match" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_be_fe" value="return scores" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_be_match" target="s4_fe_score" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_apply_fe" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_apply" target="s4_fe_apply" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_fe_apply_be" value="HTTP POST + JWT" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_fe_apply" target="s4_be_apply" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_be_apply_db" value="insert" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_be_apply" target="s4_db_app" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_review_fe" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_owner_review" target="s4_fe_status" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_fe_stat_be" value="HTTP PATCH + JWT" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_fe_status" target="s4_be_status" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e_s4_be_stat_db" value="update/insert" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" edge="1" source="s4_be_status" target="s4_db_status" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+  </root>
+</mxGraphModel>

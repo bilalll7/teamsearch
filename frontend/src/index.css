@@ -4,62 +4,71 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* TeamSearch v2.0 - Editorial Professional */
-  
-  /* Dark navy foundation */
+:root[data-theme="dark"] {
+  /* TeamSearch v2.0 - Dark Mode (Default) */
   --color-background: #0F172A;
   --color-surface: #1E293B;
   --color-surface-elevated: #334155;
-  
-  /* Typography colors */
   --color-foreground: #F8FAFC;
   --color-muted-foreground: #94A3B8;
-  
-  /* Warm accent (strategic) */
   --color-accent: #F59E0B;
   --color-accent-hover: #D97706;
-  
-  /* Action colors */
   --color-primary: #3B82F6;
   --color-primary-hover: #2563EB;
-  
-  /* Borders */
   --color-border: #334155;
   --color-border-subtle: #1E293B;
-  
-  /* Status */
-  --color-success: #10B981;
-  --color-error: #EF4444;
-  --color-warning: #F59E0B;
-  
-  /* Card */
   --color-card: #1E293B;
   --color-card-foreground: #F8FAFC;
-  
-  /* Muted */
   --color-muted: #1E293B;
-  
-  /* Ring */
   --color-ring: #3B82F6;
-  
-  /* Destructive */
   --color-destructive: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+}
+
+:root[data-theme="light"] {
+  /* TeamSearch v2.0 - Light Mode */
+  --color-background: #FFFFFF;
+  --color-surface: #F8FAFC;
+  --color-surface-elevated: #F1F5F9;
+  --color-foreground: #0F172A;
+  --color-muted-foreground: #64748B;
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  --color-border: #E2E8F0;
+  --color-border-subtle: #F1F5F9;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+  --color-muted: #F8FAFC;
+  --color-ring: #3B82F6;
+  --color-destructive: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+}
+
+/* Default to dark if no attribute set */
+:root {
+  --color-background: #0F172A;
+  --color-surface: #1E293B;
+  --color-surface-elevated: #334155;
+  --color-foreground: #F8FAFC;
+  --color-muted-foreground: #94A3B8;
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  --color-border: #334155;
+  --color-border-subtle: #1E293B;
+  --color-card: #1E293B;
+  --color-card-foreground: #F8FAFC;
+  --color-muted: #1E293B;
+  --color-ring: #3B82F6;
+  --color-destructive: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
   
-  /* Typography scale */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --text-6xl: 3.75rem;
-  --text-7xl: 4.5rem;
-  
-  /* Font family */
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
@@ -75,6 +84,7 @@ body {
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -85,4 +95,30 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@keyframes page-progress-slide {
+  0% {
+    transform: translateX(-40%) scaleX(0.35);
+  }
+  50% {
+    transform: translateX(40%) scaleX(0.6);
+  }
+  100% {
+    transform: translateX(110%) scaleX(0.45);
+  }
+}
+
+.nav-progress-bar {
+  width: 45%;
+  transform-origin: left;
+  animation: page-progress-slide 0.8s ease-in-out infinite;
+}
+
+[data-fixed-navbar] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 50 !important;
 }
